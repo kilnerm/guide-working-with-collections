@@ -88,7 +88,7 @@ git push -u private-org
 == Understanding the file structure of a Kabanero Collection
 
 Now that you have a local clone of the Kabanero Collection Hub, you will learn about the file structure so that
-you are familiar with the contents and configurable options.
+you are familiar with the contents and configurable components.
 
 Kabanero Collections are categorized into one of the following collection types:
 
@@ -175,11 +175,16 @@ a developer get started with a development project.
 
 == Creating and modifying Kabanero Collections
 
+Draft comment: Pick a stack, make a change.
+
+
+You can also modify the default Tekton pipeline that is part of this Collection. However, this guide does not cover
+working with Tekton pipelines, which is the subject of another guide.
 
 == Setting up a local build environment
 
 In addition to the tools that are defined in the **pre-requisites** section of this guide, to correctly build a
-Kabanero Collection, set the following environment variables by running `export <ENVIRONMENT_VARIABLE=option>` on the command line :
+Kabanero Collection, set the following environment variables by running `export <ENVIRONMENT_VARIABLE=option>` on the command line:
 
 `IMAGE_REGISTRY_ORG=kabanero`::
 Defines the organization for images
@@ -195,7 +200,7 @@ Defines whether to publish images to an image registry
 Defines the image registry
 `IMAGE_REGISTRY_USERNAME=<registry_username>`::
 Defines the user name for the image registry
-`IMAGE_REGISTRY_PASSWORD=<registry_password>`
+`IMAGE_REGISTRY_PASSWORD=<registry_password>`::
 Defines the password for the image registry
 
 You are now ready to build a Kabanero Collection.
@@ -207,7 +212,7 @@ of your local Kabanero Collections repository:
 
 ```
  ./ci/build.sh
- ```
+```
 
 When the build completes, you can find the deployment Docker images in your local registry by running the `docker images` command.
 
@@ -287,6 +292,3 @@ Push the tags to your GIT repository by running `git push --tags`.
 
 A further webhook can be set up to trigger a Travis build that generates a GIT release, pushing the images to the image
 repository.
-
-image:https://github.com/kabanero-io/draft-guide-collection-nodejs/raw/master/resources/codewind-workspace.png[Diagram
-shows the VS Code project view]

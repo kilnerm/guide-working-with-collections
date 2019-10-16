@@ -68,12 +68,12 @@ containerized, microservice-based applications.
 
 A Kabanero Collection includes an Appsody stack, together with build and deployment artifacts, such as Tekton pipelines. Stacks
 consist of base container images and project templates for different language runtimes and framework, such as Microprofile
-with Open Liberty, or Node.js with Express.
+with OpenLiberty, or Node.js with Express.
 
 == Creating a local Kabanero Collection Hub
 
 The *public* Kabanero Collection Hub contains all the latest collections from the Kabanero project. Before working with
-Kabanero Collections, you must build the Kabanero Collection Hub locally by cloning the public GitHub repository.
+Kabanero Collections, you must create a Kabanero Collection Hub locally by cloning the public GitHub repository.
 
 Run the following commands to clone the public Kabanero Collection Hub and push a copy of your repository (`private-org`) to your
 GitHub Enterprise organisation (`https://github.acme.com/my_org/collections.git`):
@@ -93,11 +93,11 @@ you are familiar with the contents and configurable components.
 Kabanero Collections are categorized into one of the following collection types:
 
 - **stable** collections meet a set of predefined technical requirements.
-- **incubator** collections are actively being worked on to meet the requirements for a `stable` collection.
+- **incubator** collections are actively being worked on to meet the requirements for a **stable** collection.
 - **experimental** collections are just that! You can use them for proof of concept work or to try out specific
 scenarios, but these collections are not being actively worked on.
 
-Although three categories are available, Kabanero builds only `stable` or `incubator` collections.
+Although three categories are available, Kabanero builds only **incubator** collections.
 
 In a Kabanero Collection GitHub repository, collections are contained in a folder that matches the collection category. For example, `stable/`, `incubator/`,
  or `experimental/`. Each folder contains a `common/` directory for pipelines, and a collection folder for each collection in that category. For example:
@@ -173,13 +173,75 @@ for declaring CI/CD pipelines. A Collection can have multiple pipelines.
 This directory contains pre-configured templates for applications that can be used with a stack image. These templates help
 a developer get started with a development project.
 
-== Creating and modifying Kabanero Collections
+== Modifying Kabanero Collections
 
-Draft comment: Pick a stack, make a change.
+In some cases, you might want to modify a Kabanero Collection to change the version of a software component or expose a
+specific port for a type of application. In this guide, you will modify the `java-microprofile` collection to change the
+local port number that your application runs on.
 
+Locate the `java-microprofile` collection in the `incubator` directory. The changes that you need to make are in the
+`image` directory, which contains all the artifacts needed for the development Docker image.
+
+Open the `image/project/pom.xml` file and locate the section that defines the OpenLiberty runtime. Search for the string
+`<!-- OpenLiberty runtime --> `. The section looks similar to the following example:
+
+```
+<!-- OpenLiberty runtime -->
+<liberty.groupId>io.openliberty</liberty.groupId>
+<liberty.artifactId>openliberty-runtime</liberty.artifactId>
+<version.openliberty-runtime>19.0.0.8</version.openliberty-runtime>
+<http.port>9080</http.port>
+<https.port>9443</https.port>
+<packaging.type>usr</packaging.type>
+<app.name>${project.artifactId}</app.name>
+<package.file>${project.build.directory}/${app.name}.zip</package.file>
+```
+Change the `<http.port>` from `9080` to `9090` and save your changes.
+
+Modified Kabanero Collections must be built before they can be tested and released for developers to use.
 
 You can also modify the default Tekton pipeline that is part of this Collection. However, this guide does not cover
 working with Tekton pipelines, which is the subject of another guide.
+
+== Creating Kabanero Collections
+
+Although it is possible to create a new Kabanero Collection for your organisation, we're not going to do this as part of this guide.
+However, the following steps outline the necessary tasks:
+
+- Determine which collection category you want for your collection. For example, **incubator**.
+- Follow the instructions on the Appsody website for https://appsody.dev/docs/stacks/create[Creating a Stack].
+- If you don't want to use the common pipelines (`common/pipelines/`), create and add any collection-specific pipelines
+in the `<collection>/pipelines` directory.
+- Create a `collection.yaml` file in your new `collection` folder.
+
+Example collection.yaml:
+
+```
+default-image: <new-collection-name>
+default-pipeline: default
+images:
+- id: <new-collection-name>
+   image: $IMAGE_REGISTRY_ORG/<new-collection-name>:<version>
+```
+
+Where:
+
+- `default-image:` specifies the Docker image to use for this collection.
+- `default-pipeline:` specifies which pipeline to use.
+- `images:` provides information about the Docker images used for this collection.
+- `- id:` specifies the Docker image reference information. Multiple `- id:` values can be specified, each with a unique
+Docker image, but only one can be used by the collection. The name of this Docker image must be specified in `default-image:`.
+- `$IMAGE_REGISTRY_ORG` defines the name of the image registry to use. The default is `kabanero`, which indicates the Docker hub
+organisation of `kabanero` where the Docker images are stored.
+- `<version>` is the version of your Docker image.
+
+New Kabanero Collections must be built before they can be tested and released for developers to use.
+
+== Deleting Kabanero Collections
+
+If there are Kabanero Collections that you never need, you can delete them. Simply delete the directory that contains the collection
+before you build. As an alternative, you can set environment variables to exclude collections from the build
+process, which is covered in the following section.
 
 == Setting up a local build environment
 
@@ -188,20 +250,9 @@ Kabanero Collection, set the following environment variables by running `export 
 
 `IMAGE_REGISTRY_ORG=kabanero`::
 Defines the organization for images
-`CODEWIND_INDE=false`::
+`CODEWIND_INDEX=false`::
 Defines whether to build the Codewind index file for application development in VS Code, Eclipse, or Eclipse Che. If you
 want to build and test a collection for use with Codewind in an IDE, change this value to `true`.
-
-If you plan to manually release collections, you must also export the following environment variables:
-
-`IMAGE_REGISTRY_PUBLISH=false`::
-Defines whether to publish images to an image registry
-`IMAGE_REGISTRY=<registry>`::
-Defines the image registry
-`IMAGE_REGISTRY_USERNAME=<registry_username>`::
-Defines the user name for the image registry
-`IMAGE_REGISTRY_PASSWORD=<registry_password>`::
-Defines the password for the image registry
 
 You are now ready to build a Kabanero Collection.
 
@@ -214,25 +265,39 @@ of your local Kabanero Collections repository:
  ./ci/build.sh
 ```
 
-When the build completes, you can find the deployment Docker images in your local registry by running the `docker images` command.
+The build processes the files for **incubator** collections, testing the format of the files, and finally building
+the development Docker images. When the build completes, you can find the images in your local registry by running the
+`docker images` command.
 
 Other collection assets can be found in the `$PWD/ci/assets/` directory.
 
-The build process also adds your local Kabanero Collection to the Appsody repository list.
+
+=== Excluding a collection
+
+If you want to exclude a collection at build time, you must set the following two environment variables:
+
+REPO_LIST=<category>::
+Defines the category of collection to search. For example, `export REPO_LIST=incubator` builds only collections in the incubator directory, which is the default.
+To build collections in the **experimental** and **incubator** categories, use `export REPO_LIST=incubator experimental`.
+EXCLUDED_STACKS=<category/collection_name>::
+Defines which collections to exclude from the build. For example, `export EXCLUDED_STACKS=incubator/nodejs`
 
 == Testing a Kabanero Collection locally
 
 First, make sure that your local Kabanero index is correctly added to the Appsody repository list by running `appsody repo list`.
 The output is similar to the following example:
 
-
 If the `kabanero-index-local` repository is not in the list, add it manually by running the following command:
 
 ```
-appsody repo add kabanero-index-list file://$PWD/ci/assets/kabanero-index-local.YAML
+appsody repo add kabanero-index-local file://$PWD/ci/assets/kabanero-index-local.yaml
 ```
 
-Draft comment: Do we need to set the repo as the default?
+To set your repository as the default, run:
+
+```
+appsody repo set-default kabanero-index-local
+```
 
 You can now test your updated collection.
 
@@ -245,27 +310,30 @@ export APPSODY_PULL_POLICY=IFNOTPRESENT
 To create a new project that is based on your updated collection, run:
 
 ```
-appsody init whatevercollectionwechoose (and if we set a default we can avoid specifying the index-repo/stack)
+mkdir java-microprofile
+cd java-microprofile
+appsody init java-microprofile
 ```
 
-Draft comment: We should have a quick sample and appsody run to prove it works correctly.
+The project is created in the `java-microprofile` directory with a sample starter application. To start the development
+environment, type `appsody run`.
 
-Draft comment: We should have something better here for testing pipelines.
+The Appsody CLI launches a local Docker image that contains an Open Liberty server that hosts the microservice.
+After some time, you see a message similar to the following example:
 
-Testing your collection would not be complete without testing your pipelines. Working with pipelines is covered in a separate guide.
+```
+[Container] [INFO] [AUDIT   ] CWWKF0011I: The defaultServer server is ready to run a smarter planet. The defaultServer server started in 20.235 seconds.
+```
 
-== Testing your Kabanero Collection with a test GIT release
+To check that the port changes you made when you modified the collection were successful, open your browser and
+navigate to `http://localhost:9090` to see the running application:
 
-Draft comment: Is this more a Todd test? ->-> unedited
+image:https://github.com/kabanero-io/draft-guide-working-with-collections/raw/master/resources/browser.png[Diagram
+shows the browser for http://localhost:9090, which shows the "Welcome to your Appsody microservice" starter app.]
 
-Before creating a final production release for use with your Kabanero installation, you may wish to create a test release on a test GIT repository.
+Congratulations! Your changes were successful.
 
-Use these instructions to create a GIT release manually from your local build.
-Once all the artifacts are uploaded to the GIT Release, go to the assets inside that release and find the file kabanero-index.yaml and copy its URL. e.g. https://github.com/kabanero-io/collections/releases/download/v0.2.0.beta2/kabanero-index.yaml
-Within your Kabanero environment create a sample.yaml based on this sample yaml e.g. https://raw.githubusercontent.com/kabanero-io/kabanero-operator/master/config/samples/full.yaml
-In the yaml update the URL for the kabanero-index.yaml to tghe one from the release. e.g. https://github.com/kabanero-io/collections/releases/download/v0.2.0.beta2/kabanero-index.yaml
-Save the yaml and then apply it to your Kabanero instance kubectl apply -f sample.yaml
-This will update the collections and pipelines in your environment. New collections and pipeline should get activated as a result of this step.
+Full testing for your collections would not be complete without testing your pipelines. Working with pipelines is covered in a separate guide.
 
 == Releasing Kabanero Collections
 
@@ -276,10 +344,8 @@ git commit -a -m "Test Kabanero Collection created"
 git push -u private-org
 ```
 
-You can use Jenkins or Travis to trigger events based on webhooks. For example, you can set up a webhook that triggers a Travis build
-of your collections when a GIT merge takes place, providing an additional build test.
-
-Draft comment: Annotated tags?
+You can use Jenkins or Travis to trigger events. For example, you can set up a Travis to automatically build your
+collections when a GIT merge takes place, providing an additional build test.
 
 It is good practice to create release tags in GIT for versions of your collections. Create a GIT tag for your
 test collection:
@@ -290,5 +356,5 @@ git tag v0.1.0 -m "Test collection, version 0.1.0"
 
 Push the tags to your GIT repository by running `git push --tags`.
 
-A further webhook can be set up to trigger a Travis build that generates a GIT release, pushing the images to the image
-repository.
+Again, you can set up Travis to automatically trigger a build that generates a GIT release, pushing the images to the
+image repository for your organisation.

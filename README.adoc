@@ -442,3 +442,8 @@ Push the tags to your GIT repository by running `git push --tags`.
 Again, you can set up Travis to automatically trigger a build that generates a GIT release, pushing the images to the
 image repository for your organisation. If you want to learn how to manually create a GIT release from a local build, see
 https://github.com/kabanero-io/collections/blob/master/create-release.md[Create GIT release manually].
+
+Now that you've built your customized Kabanero Collection Hub, remember to do the following tasks:
+
+. Publish the release URL to your developers so that they can set up Appsody CLI or Codewind to point at the new Collection Hub.
+. Activate the collections in the target Kabanero instance so that the Tekton pipelines can be installed in that environment.

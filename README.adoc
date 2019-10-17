@@ -16,7 +16,7 @@
 :projectid: working-with-collections
 :page-duration: 30 minutes
 :page-releasedate: 2019-10-15
-:page-description: Learn how to create, update, build, test, and publish a customized Kabanero Collection.
+:page-description: Learn how to create, update, build, test, and publish a Kabanero Collection.
 :guide-author: Kabanero
 :page-tags: ['Collection', 'Node', 'Node.js', 'Nodejs']
 :page-guide-category: collections
@@ -68,7 +68,7 @@ containerized, microservice-based applications.
 
 A Kabanero Collection includes an Appsody stack, together with build and deployment artifacts, such as Tekton pipelines. Stacks
 consist of base container images and project templates for different language runtimes and framework, such as Microprofile
-with OpenLiberty, or Node.js with Express.
+with Open Liberty, or Node.js with Express.
 
 == Creating a local Kabanero Collection Hub
 
@@ -85,7 +85,11 @@ git remote add private-org https://github.acme.com/my_org/collections.git
 git push -u private-org
 ```
 
-== Understanding the file structure of a Kabanero Collection
+// =================================================================================================
+// Understanding the file structure
+// =================================================================================================
+
+== Understanding the file structure
 
 Now that you have a local clone of the Kabanero Collection Hub, you will learn about the file structure so that
 you are familiar with the contents and configurable components.
@@ -173,19 +177,25 @@ for declaring CI/CD pipelines. A Collection can have multiple pipelines.
 This directory contains pre-configured templates for applications that can be used with a stack image. These templates help
 a developer get started with a development project.
 
+// =================================================================================================
+// Modifying Kabanero Collections
+// =================================================================================================
+
+
 == Modifying Kabanero Collections
 
 In some cases, you might want to modify a Kabanero Collection to change the version of a software component or expose a
 specific port for a type of application. In this guide, you will modify the `java-microprofile` collection to change the
-local port number that your application runs on.
+version of Open Liberty that your application runs on.
 
 Locate the `java-microprofile` collection in the `incubator` directory. The changes that you need to make are in the
 `image` directory, which contains all the artifacts needed for the development Docker image.
 
-Open the `image/project/pom.xml` file and locate the section that defines the OpenLiberty runtime. Search for the string
-`<!-- OpenLiberty runtime --> `. The section looks similar to the following example:
+Open the `image/project/pom.xml` file and locate the section that defines the Open Liberty runtime. Search for the string
+**<!-- OpenLiberty runtime**. The section looks similar to the following example:
 
-```
+[source,xml]
+----
 <!-- OpenLiberty runtime -->
 <liberty.groupId>io.openliberty</liberty.groupId>
 <liberty.artifactId>openliberty-runtime</liberty.artifactId>
@@ -195,15 +205,64 @@ Open the `image/project/pom.xml` file and locate the section that defines the Op
 <packaging.type>usr</packaging.type>
 <app.name>${project.artifactId}</app.name>
 <package.file>${project.build.directory}/${app.name}.zip</package.file>
-```
-Change the `<http.port>` from `9080` to `9090` and save your changes.
+----
 
-Modified Kabanero Collections must be built before they can be tested and released for developers to use.
+Change the value of `<version.openliberty-runtime>` from `19.0.0.8` to `19.0.0.9`.
+
+Next, locate the section that references the Maven enforcer plugin, which the build uses to ensure that the correct version
+of the Open Liberty runtime is being used. The section looks similar to the following example:
+
+[source,xml]
+----
+<!-- maven-enforcer-plugin -->
+<build>
+    <plugins>
+        <!-- Enforcing OpenLiberty and JDK Version -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <version>3.0.0-M2</version>
+            <executions>
+            <execution>
+                <id>enforce-versions</id>
+                <goals>
+                    <goal>enforce</goal>
+                </goals>
+                <configuration>
+                    <rules>
+                        <requireJavaVersion>
+                            <version>[1.8,1.9)</version>
+                        </requireJavaVersion>
+                        <requireProperty>
+                            <property>version.openliberty-runtime</property>
+                            <regex>19.0.0.9</regex>
+                            <regexMessage>OpenLiberty runtime version must be 19.0.0.9</regexMessage>
+                        </requireProperty>
+                    </rules>
+                </configuration>
+            </execution>
+        </executions>
+        </plugin>
+    </plugins>
+</build>
+----
+
+Change the `<regex>` and `<regexMessage>` values from `19.0.0.8` to `19.0.0.9`.
+
+Now save your changes to the `pom.xml` file.
+
+Modified Kabanero Collections must be built before they can be tested and released for developers to use. This task
+is covered in a later section of the guide.
 
 You can also modify the default Tekton pipeline that is part of this Collection. However, this guide does not cover
 working with Tekton pipelines, which is the subject of another guide.
 
-== Creating Kabanero Collections
+
+// =================================================================================================
+// Creating Kabanero Collections
+// =================================================================================================
+
+Creating Kabanero Collections
 
 Although it is possible to create a new Kabanero Collection for your organisation, we're not going to do this as part of this guide.
 However, the following steps outline the necessary tasks:
@@ -230,18 +289,23 @@ Where:
 - `default-pipeline:` specifies which pipeline to use.
 - `images:` provides information about the Docker images used for this collection.
 - `- id:` specifies the Docker image reference information. Multiple `- id:` values can be specified, each with a unique
-Docker image, but only one can be used by the collection. The name of this Docker image must be specified in `default-image:`.
+Docker image, but only one can be used by the collection. The name of the Docker image you want to use must be specified in `default-image:`.
 - `$IMAGE_REGISTRY_ORG` defines the name of the image registry to use. The default is `kabanero`, which indicates the Docker hub
 organisation of `kabanero` where the Docker images are stored.
 - `<version>` is the version of your Docker image.
 
-New Kabanero Collections must be built before they can be tested and released for developers to use.
+New Kabanero Collections must be built before they can be tested and released for developers to use. This task
+is covered in a later section of the guide.
+
+// =================================================================================================
+// Deleting Kabanero Collections
+// =================================================================================================
 
 == Deleting Kabanero Collections
 
 If there are Kabanero Collections that you never need, you can delete them. Simply delete the directory that contains the collection
 before you build. As an alternative, you can set environment variables to exclude collections from the build
-process, which is covered in the following section.
+process, which is covered later in the build section.
 
 == Setting up a local build environment
 
@@ -256,7 +320,11 @@ want to build and test a collection for use with Codewind in an IDE, change this
 
 You are now ready to build a Kabanero Collection.
 
-== Building a Kabanero Collection
+// =================================================================================================
+// Building Kabanero Collections
+// =================================================================================================
+
+== Building Kabanero Collections
 
 To build all the **incubator** collections, run the following command from the root directory
 of your local Kabanero Collections repository:
@@ -276,11 +344,16 @@ Other collection assets can be found in the `$PWD/ci/assets/` directory.
 
 If you want to exclude a collection at build time, you must set the following two environment variables:
 
-REPO_LIST=<category>::
+`REPO_LIST=<category>`::
 Defines the category of collection to search. For example, `export REPO_LIST=incubator` builds only collections in the incubator directory, which is the default.
 To build collections in the **experimental** and **incubator** categories, use `export REPO_LIST=incubator experimental`.
-EXCLUDED_STACKS=<category/collection_name>::
+`EXCLUDED_STACKS=<category/collection_name>`::
 Defines which collections to exclude from the build. For example, `export EXCLUDED_STACKS=incubator/nodejs`
+
+
+// =================================================================================================
+// Testing Kabanero Collections
+// =================================================================================================
 
 == Testing a Kabanero Collection locally
 
@@ -318,22 +391,35 @@ appsody init java-microprofile
 The project is created in the `java-microprofile` directory with a sample starter application. To start the development
 environment, type `appsody run`.
 
-The Appsody CLI launches a local Docker image that contains an Open Liberty server that hosts the microservice.
-After some time, you see a message similar to the following example:
+The Appsody CLI starts the development Docker container, builds all the necessary stack components, and
+runs the starter microservice application. When the process completes, the following message is shown:
 
-```
+[source,bash]
+----
 [Container] [INFO] [AUDIT   ] CWWKF0011I: The defaultServer server is ready to run a smarter planet. The defaultServer server started in 20.235 seconds.
-```
+----
 
-To check that the port changes you made when you modified the collection were successful, open your browser and
-navigate to `http://localhost:9090` to see the running application:
+If you scroll upwards in the console, you can see that Open Liberty 19.0.0.9 is in use. The output looks similar to the following
+example:
+
+image:https://github.com/kabanero-io/draft-guide-working-with-collections/raw/master/resources/console.png[Diagram
+shows the output from the `appsody run` command, which confirms that Open Liberty 19.0.0.9 is in use.]
+
+
+If you open your browser to `http://localhost:9080` you can see that the starter microservice application is running
+successfully, as shown in the following diagram:
 
 image:https://github.com/kabanero-io/draft-guide-working-with-collections/raw/master/resources/browser.png[Diagram
-shows the browser for http://localhost:9090, which shows the "Welcome to your Appsody microservice" starter app.]
+shows the browser running the "Welcome to your Appsody microservice" starter app.]
 
-Congratulations! Your changes were successful.
+Congratulations! The changes you made to the Kabanero Collection were successful.
 
 Full testing for your collections would not be complete without testing your pipelines. Working with pipelines is covered in a separate guide.
+
+
+// =================================================================================================
+// Releasing Kabanero Collections
+// =================================================================================================
 
 == Releasing Kabanero Collections
 

@@ -1,3 +1,15 @@
+---
+permalink: /guides/working-with-collections
+---
+
+:page-layout: guide
+:page-duration: 30 minutes
+:page-releasedate: 2019-10-15
+:page-description: Learn how to create, update, build, test, and publish a Kabanero Collection.
+:page-tags: ['Collection', 'Node', 'Node.js', 'Nodejs']
+:page-guide-category: collections
+= Working with Kabanero Collections
+
 //	Copyright 2019 IBM Corporation and others.
 //
 //	Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +24,6 @@
 //	See the License for the specific language governing permissions and
 //	limitations under the License.
 //
-:page-layout: guide
-:projectid: working-with-collections
-:page-duration: 30 minutes
-:page-releasedate: 2019-10-15
-:page-description: Learn how to create, update, build, test, and publish a Kabanero Collection.
-:guide-author: Kabanero
-:page-tags: ['Collection', 'Node', 'Node.js', 'Nodejs']
-:page-guide-category: collections
-:page-essential: true
-:page-essential-order: 1
-:page-permalink: /guides/working-with-collections/
-:imagesdir: /resources
-= Working with Kabanero Collections
 
 [.hidden]
 NOTE: This repository contains the guide documentation source. To view
@@ -402,15 +401,13 @@ runs the starter microservice application. When the process completes, the follo
 If you scroll upwards in the console, you can see that Open Liberty 19.0.0.9 is in use. The output looks similar to the following
 example:
 
-image:https://github.com/kabanero-io/draft-guide-working-with-collections/raw/master/resources/console.png[Diagram
-shows the output from the `appsody run` command, which confirms that Open Liberty 19.0.0.9 is in use.]
+image::img/guide/console.png[link="/img/guide/console.png" alt="Diagram shows the output from the `appsody run` command, which confirms that Open Liberty 19.0.0.9 is in use."]
 
 
 If you open your browser to `http://localhost:9080` you can see that the starter microservice application is running
 successfully, as shown in the following diagram:
 
-image:https://github.com/kabanero-io/draft-guide-working-with-collections/raw/master/resources/browser.png[Diagram
-shows the browser running the "Welcome to your Appsody microservice" starter app.]
+image::/img/guide/browser.png[link="/img/guide/browser.png" alt="Diagram shows the browser running the Welcome to your Appsody microservice starter app."]
 
 Congratulations! The changes you made to the Kabanero Collection were successful.
 
@@ -443,4 +440,5 @@ git tag v0.1.0 -m "Test collection, version 0.1.0"
 Push the tags to your GIT repository by running `git push --tags`.
 
 Again, you can set up Travis to automatically trigger a build that generates a GIT release, pushing the images to the
-image repository for your organisation.
+image repository for your organisation. If you want to learn how to manually create a GIT release from a local build, see
+https://github.com/kabanero-io/collections/blob/master/create-release.md[Create GIT release manually].

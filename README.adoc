@@ -1,12 +1,12 @@
 ---
-permalink: /guides/working-with-collections
+permalink: /guides/working-with-collections/
 ---
 
 :page-layout: guide
 :page-duration: 30 minutes
 :page-releasedate: 2019-10-15
 :page-description: Learn how to create, update, build, test, and publish a Kabanero Collection.
-:page-tags: ['Collection', 'Node', 'Node.js', 'Nodejs']
+:page-tags: ['Collection', 'Java', 'MicroProfile']
 :page-guide-category: collections
 = Working with Kabanero Collections
 
@@ -66,7 +66,7 @@ A Kabanero Collection Hub contains a set of Kabanero Collections that organisati
 containerized, microservice-based applications.
 
 A Kabanero Collection includes an Appsody stack, together with build and deployment artifacts, such as Tekton pipelines. Stacks
-consist of base container images and project templates for different language runtimes and framework, such as Microprofile
+consist of base container images and project templates for different language runtimes and framework, such as Eclipse Microprofile
 with Open Liberty, or Node.js with Express.
 
 == Creating a local Kabanero Collection Hub
@@ -401,13 +401,13 @@ runs the starter microservice application. When the process completes, the follo
 If you scroll upwards in the console, you can see that Open Liberty 19.0.0.9 is in use. The output looks similar to the following
 example:
 
-image::img/guide/console.png[link="/img/guide/console.png" alt="Diagram shows the output from the `appsody run` command, which confirms that Open Liberty 19.0.0.9 is in use."]
+image::img/guide/working-with-collections-console.png[link="/img/guide/working-with-collections-console.png" alt="Diagram shows the output from the `appsody run` command, which confirms that Open Liberty 19.0.0.9 is in use."]
 
 
 If you open your browser to `http://localhost:9080` you can see that the starter microservice application is running
 successfully, as shown in the following diagram:
 
-image::/img/guide/browser.png[link="/img/guide/browser.png" alt="Diagram shows the browser running the Welcome to your Appsody microservice starter app."]
+image::/img/guide/working-with-collections-browser.png[link="/img/guide/working-with-collections-browser.png" alt="Diagram shows the browser running the Welcome to your Appsody microservice starter app."]
 
 Congratulations! The changes you made to the Kabanero Collection were successful.
 

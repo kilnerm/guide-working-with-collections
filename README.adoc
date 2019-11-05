@@ -4,7 +4,7 @@ permalink: /guides/working-with-collections/
 
 :page-layout: guide
 :page-duration: 30 minutes
-:page-releasedate: 2019-10-15
+:page-releasedate: 2019-11-05
 :page-description: Learn how to create, update, build, test, and publish Kabanero Collections.
 :page-tags: ['Collection', 'Java', 'MicroProfile']
 :page-guide-category: collections
@@ -67,22 +67,24 @@ containerized, microservice-based applications.
 
 A Kabanero Collection includes an Appsody stack, together with build and deployment artifacts, such as Tekton pipelines along with an enterprise-grade Kubernetes operator for deployment and day2 operations of the runtime and framework. Appsody Stacks
 consist of base container images and project templates for a specific language runtime and framework, such as Eclipse Microprofile
-with Open Liberty, Spring Boot with Tomcat or Node.js with Express.
+with Open Liberty, Spring Boot with Tomcat, or Node.js with Express.
 
 == Creating a local Kabanero Collection Hub
 
 The *public* Kabanero Collection Hub contains all the latest collections from the Kabanero project. Before working with
-Kabanero Collections, you must create a Kabanero Collection Hub locally by cloning the public GitHub repository.  This will allow you to customize, enable or disable individual Collections for your enterprise.  Customizations you make can be merged with future updates from the public Collection Hub using standard Git.
+Kabanero Collections, you must create a Kabanero Collection Hub locally by cloning the public GitHub repository.  This will allow you to customize, enable, or disable individual Collections for your enterprise.  Customizations you make can be merged with future updates from the public Collection Hub using standard Git.
 
 Run the following commands to clone the public Kabanero Collection Hub and push a copy of your repository (`private-org`) to your
 GitHub Enterprise organisation (`https://github.acme.com/my_org/collections.git`):
 
 ```
-git clone https://github.com/kabanero-io/collections.git
+git clone https://github.com/kabanero-io/collections.git -b <branch_name>
 cd collections
 git remote add private-org https://github.acme.com/my_org/collections.git
 git push -u private-org
 ```
+
+where `<branch-name>` refers to a Kabanero release branch, such as `release-0.2`.
 
 While instructions here are for GitHub Enterprise, you could also use GitHub or GitLab.
 
@@ -99,7 +101,7 @@ Kabanero Collections are categorized into one of the following collection types:
 
 - **stable** collections meet a set of predefined technical requirements.
 - **incubator** collections are actively being worked on to meet the requirements for a **stable** collection.
-- **experimental** collections are just that! Early delivery of experimental collections allow for testing and socialization of new technologies and approaches to solving problems.  Quality may vary.
+- **experimental** collections are just that! Early delivery of experimental collections allow for testing and socialization of new technologies and approaches to solving problems.  Quality might vary.
 
 Although three categories are available, Kabanero builds only **incubator** collections.
 
@@ -184,8 +186,8 @@ a developer get started with a development project.
 
 == Modifying Collections
 
-In some cases, you might want to modify a Collection to change the software compoents, the version of a software component or expose a
-specific port for a type of application. 
+In some cases, you might want to modify a Collection to change the software components, the version of a software component, or expose a
+specific port for a type of application.
 
 In this guide, you will modify the `java-microprofile` collection to change the
 version of Open Liberty that your application runs on.
@@ -237,8 +239,8 @@ of the Open Liberty runtime is being used. The section looks similar to the foll
                         </requireJavaVersion>
                         <requireProperty>
                             <property>version.openliberty-runtime</property>
-                            <regex>19.0.0.9</regex>
-                            <regexMessage>OpenLiberty runtime version must be 19.0.0.9</regexMessage>
+                            <regex>19.0.0.8</regex>
+                            <regexMessage>OpenLiberty runtime version must be 19.0.0.8</regexMessage>
                         </requireProperty>
                     </rules>
                 </configuration>
@@ -264,7 +266,7 @@ working with Tekton pipelines, which is the subject of another guide.
 // Creating Collections
 // =================================================================================================
 
-Creating Collections
+== Creating Collections
 
 Although it is possible to create a new Collection for your organisation, we're not going to do this as part of this guide.
 However, the following steps outline the necessary tasks:
@@ -303,7 +305,7 @@ is covered in a later section of the guide.
 // Deleting Kabanero Collections
 // =================================================================================================
 
-== Deleting KCollections
+== Deleting Collections
 
 If there are Collections that you never need, you can delete them. Simply delete the directory that contains the collection
 before you build. As an alternative, you can set environment variables to exclude collections from the build
@@ -353,7 +355,7 @@ Defines which collections to exclude from the build. For example, `export EXCLUD
 
 
 // =================================================================================================
-// Testing KCollections
+// Testing Collections
 // =================================================================================================
 
 == Testing a Collection locally

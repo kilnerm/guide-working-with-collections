@@ -279,13 +279,14 @@ in the `<collection>/pipelines` directory.
 
 Example collection.yaml:
 
-```
+[source, yaml]
+----
 default-image: <new-collection-name>
 default-pipeline: default
 images:
 - id: <new-collection-name>
    image: $IMAGE_REGISTRY_ORG/<new-collection-name>:<version>
-```
+----
 
 Where:
 

@@ -74,7 +74,7 @@ with Open Liberty, Spring Boot with Tomcat, or Node.js with Express.
 The *public* Kabanero Collection Hub contains all the latest collections from the Kabanero project. Before working with
 Kabanero Collections, you must create a Kabanero Collection Hub locally by cloning the public GitHub repository.  This will allow you to customize, enable, or disable individual Collections for your enterprise.  Customizations you make can be merged with future updates from the public Collection Hub using standard Git.
 
-Run the following commands to clone the public Kabanero Collection Hub and push a copy to a private git repository:
+Run the following commands to clone the public Kabanero Collection Hub and push a copy to a private Git repository:
 
 ```
 git clone https://github.com/kabanero-io/collections.git -b <branch_name>

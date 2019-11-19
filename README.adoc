@@ -187,7 +187,7 @@ In some cases, you might want to modify a Collection to change the software comp
 specific port for a type of application.
 
 In this guide, you will modify the `java-microprofile` collection to change the
-version of Open Liberty that your application runs on.
+version of Open Liberty used during development of your application.
 
 Locate the `java-microprofile` collection in the `incubator` directory. The changes that you need to make are in the
 `image` directory, which contains all the artifacts needed for the development container image.
@@ -200,7 +200,7 @@ Open the `image/project/pom.xml` file and locate the section that defines the Op
 <!-- OpenLiberty runtime -->
 <liberty.groupId>io.openliberty</liberty.groupId>
 <liberty.artifactId>openliberty-runtime</liberty.artifactId>
-<version.openliberty-runtime>19.0.0.8</version.openliberty-runtime>
+<version.openliberty-runtime>19.0.0.9</version.openliberty-runtime>
 <http.port>9080</http.port>
 <https.port>9443</https.port>
 <packaging.type>usr</packaging.type>
@@ -208,7 +208,7 @@ Open the `image/project/pom.xml` file and locate the section that defines the Op
 <package.file>${project.build.directory}/${app.name}.zip</package.file>
 ----
 
-Change the value of `<version.openliberty-runtime>` from `19.0.0.8` to `19.0.0.9`.
+Change the value of `<version.openliberty-runtime>` from `19.0.0.9` to the fixpack level you are updating to, eg, `19.0.0.10`.
 
 Next, locate the section that references the Maven enforcer plugin, which the build uses to ensure that the correct version
 of the Open Liberty runtime is being used. The section looks similar to the following example:
@@ -236,8 +236,8 @@ of the Open Liberty runtime is being used. The section looks similar to the foll
                         </requireJavaVersion>
                         <requireProperty>
                             <property>version.openliberty-runtime</property>
-                            <regex>19.0.0.8</regex>
-                            <regexMessage>OpenLiberty runtime version must be 19.0.0.8</regexMessage>
+                            <regex>19.0.0.9</regex>
+                            <regexMessage>OpenLiberty runtime version must be 19.0.0.9</regexMessage>
                         </requireProperty>
                     </rules>
                 </configuration>
@@ -248,9 +248,17 @@ of the Open Liberty runtime is being used. The section looks similar to the foll
 </build>
 ----
 
-Change the `<regex>` and `<regexMessage>` values from `19.0.0.8` to `19.0.0.9`.
+Change the `<regex>` and `<regexMessage>` values from `19.0.0.9` to the fixpack level you are updating to, eg, `19.0.0.10`.
 
 Now save your changes to the `pom.xml` file.
+
+If you want to update the version of OpenLiberty your application is deployed on then you will aslo need to make changes to the deployment Dockerfile. Open the `image/project/Dockerfile` file and locate the second `FROM` statement within it. The line will look similar to the following example:
+
+[source,xml]
+----
+FROM openliberty/open-liberty:19.0.0.9-microProfile3-ubi-min
+----
+update the line with your target docker image, for example `FROM openliberty/open-liberty:microProfile3-ubi-min` would default to always deploying against the latest tag available. Details on available tags can be found on the OpenLiberty dockerhub repository: https://hub.docker.com/r/openliberty/open-liberty
 
 Modified Collections must be built before they can be tested and released for developers to use. This task
 is covered in a later section of the guide.
